@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet, Alert, PanResponder } from 'react-native';
+import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet, Alert, PanResponder, Share } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
@@ -63,6 +63,16 @@ function RenderCampsite(props) {
         }
     });
 
+    const shareCampsite = (title, message, url) => {
+        Share.share({
+            title,
+            message: `${title}: ${message} ${url}`,
+            url
+        }, {
+            dialogTitle: 'Share ' + title
+        });
+    };
+
     if (campsite) {
         return (
             <Animatable.View 
@@ -93,6 +103,14 @@ function RenderCampsite(props) {
                             raised
                             reverse
                             onPress={() => props.onShowModal()}
+                        />
+                        <Icon
+                            name={'share'}
+                            type='font-awesome'
+                            color='#5637DD'
+                            raised
+                            reverse
+                            onPress={() => shareCampsite(campsite.name, campsite.description, baseUrl + campsite.image)}
                         />
                     </View>
                 </Card>
@@ -149,7 +167,7 @@ class CampsiteInfo extends Component {
 
     handleComment(campsiteId) {
         this.toggleModal();
-        this.props.postComment(this.props.campsiteId, value.rating, value.author, value.text);
+        this.props.postComment(campsiteId, value.rating, value.author, value.text);
     }
    
     resetForm() {
@@ -200,7 +218,7 @@ class CampsiteInfo extends Component {
                             leftIcon={{type: 'font-awesome', name: 'user-o'}}
                             leftIconContainerStyle={{paddingRight:10}}
                             onChangeText={author => this.setState({author: author})}
-                            value={this.state.text}
+                            value={this.state.author}
                         />
                         <Input 
                             placeholder='Comments'
